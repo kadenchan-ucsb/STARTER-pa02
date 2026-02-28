@@ -81,6 +81,7 @@ int main(int argc, char** argv){
         return a.title < b.title;
     });
 
+    vector<pair<string, Movie>> highestMovies;
     for (const string &pref : prefixes) {
         auto it = lower_bound(movieList.begin(), movieList.end(), pref,[](const Movie &m, const string &value) {
             return m.title < value;
@@ -114,9 +115,11 @@ int main(int argc, char** argv){
             cout<<endl;
         }
         if (found) {
-            cout << "Best movie with prefix " << pref << " is: "
-                << bestName << " with rating " <<  bestRating << endl;
+            highestMovies.push_back(make_pair(pref, Movie(bestName, bestRating)));
         }
+    }
+    for(pair<string, Movie> &p : highestMovies) {
+        cout << "Best movie with prefix " << p.first << " is " << p.second.title << " with rating " << p.second.rating << endl;
     }
     
     return 0;
