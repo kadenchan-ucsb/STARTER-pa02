@@ -96,6 +96,7 @@ int main(int argc, char** argv){
             });
             for (const Movie &m : matches)
                 m.printMovie();
+            cout<<endl;
         }
     }
     for (const string &pref : prefixes) {
