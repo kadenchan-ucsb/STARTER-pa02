@@ -1,6 +1,6 @@
 // Winter'24
 // Instructor: Diba Mirza
-// Student name: 
+// Student name: Kaden Chan
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -39,17 +39,27 @@ int main(int argc, char** argv){
     string line, movieName;
     double movieRating;
     // Read each file and store the name and rating
+    std::priority_queue<Movie, std::vector<Movie>, decltype(cmp)> pq(cmp);
+    vector<Movie> movieList;
+
     while (getline (movieFile, line) && parseLine(line, movieName, movieRating)){
             // Use std::string movieName and double movieRating
             // to construct your Movie objects
             // cout << movieName << " has rating " << movieRating << endl;
             // insert elements into your data structure
+            
+            pq.push(Movie(movieName, movieRating));
+            movieList.push_back(Movie(movieName, movieRating));
     }
 
     movieFile.close();
 
     if (argc == 2){
             //print all the movies in ascending alphabetical order of movie names
+            while (!pq.empty()) {
+                pq.top().printMovie();
+                pq.pop();
+            }
             return 0;
     }
 
@@ -70,12 +80,45 @@ int main(int argc, char** argv){
     //  For each prefix,
     //  Find all movies that have that prefix and store them in an appropriate data structure
     //  If no movie with that prefix exists print the following message
-    cout << "No movies found with prefix "<<"<replace with prefix>" << endl;
-
-    //  For each prefix,
-    //  Print the highest rated movie with that prefix if it exists.
-    cout << "Best movie with prefix " << "<replace with prefix>" << " is: " << "replace with movie name" << " with rating " << std::fixed << std::setprecision(1) << "replace with movie rating" << endl;
-
+    for (const string &pref : prefixes) {
+        vector<Movie> matches;
+        for (const Movie &m : movieList) {
+            if (m.title.rfind(pref, 0) == 0)
+                matches.push_back(m);
+        }
+        if (matches.empty()) {
+            cout << "No movies found with prefix " << pref << endl;
+        } else {
+            sort(matches.begin(), matches.end(), [](const Movie &a, const Movie &b) {
+                if (a.rating != b.rating)
+                    return a.rating > b.rating;     
+                return a.title < b.title;
+            });
+            for (const Movie &m : matches)
+                m.printMovie();
+        }
+    }
+    for (const string &pref : prefixes) {
+        double bestRating = -1.0;
+        string bestName;
+        bool found = false;
+        for (const Movie &m : movieList) {
+            if (m.title.rfind(pref, 0) == 0) {
+                if (!found ||
+                    m.rating > bestRating ||
+                    (m.rating == bestRating && m.title < bestName)) {
+                    bestRating = m.rating;
+                    bestName = m.title;
+                    found = true;
+                }
+            }
+        }
+        if (found) {
+            cout << "Best movie with prefix " << pref << " is: "
+                << bestName << " with rating " << fixed << setprecision(1)
+                << bestRating << endl;
+        }
+    }
     return 0;
 }
 
