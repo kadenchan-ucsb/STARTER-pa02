@@ -90,17 +90,16 @@ int main(int argc, char** argv){
         double bestRating = -1.0;
         string bestName;
         bool found = false;
-        for (const Movie &m : movieList) {
-            if (m.title.rfind(pref, 0) == 0){
-                matches.push_back(m);
+        while (it!=movieList.end() && it->title.compare(0, pref.length(), pref) == 0) {
+            matches.push_back(*it);
                 if (!found ||
-                    m.rating > bestRating ||
-                    (m.rating == bestRating && m.title < bestName)) {
-                    bestRating = m.rating;
-                    bestName = m.title;
+                    it->rating > bestRating ||
+                    (it->rating == bestRating && it->title < bestName)) {
+                    bestRating = it->rating;
+                    bestName = it->title;
                     found = true;
                 }
-            }
+            ++it;
         }
         if (matches.empty()) {
             cout << "No movies found with prefix " << pref << endl;
