@@ -93,8 +93,7 @@ int main(int argc, char** argv){
         while (it!=movieList.end() && it->title.compare(0, pref.length(), pref) == 0) {
             matches.push_back(*it);
                 if (!found ||
-                    it->rating > bestRating ||
-                    (it->rating == bestRating && it->title < bestName)) {
+                    it->rating > bestRating ||(it->rating == bestRating && it->title < bestName)) {
                     bestRating = it->rating;
                     bestName = it->title;
                     found = true;
@@ -124,7 +123,30 @@ int main(int argc, char** argv){
     return 0;
 }
 
-/* Add your run time analysis for part 3 of the assignment here as commented block*/
+/*input_20_random.csv: 0.015s
+input_100_random.csv: 0.013s
+input_1000_random.csv: 0.015s
+input_10000_random.csv: 0.140s
+
+all n, m, k, and l should affect runtime
+
+Runtime of algorithm after the movies are stored in a vector:
+Starts with an alphabetic sort of the movies(l*n*log n)
+In a loop that runs once per prefix(m):
+    Binary search for the first movie with the prefix(l log n)
+    Loop through movies with the prefix and find the best rated movie(l*k)
+    Sort the movies with the prefix by rating and name(l*k*log k)
+Loop through list of best movies and print(at most l*k)
+
+l*n*log n + m*(l log n + l*k + l*k*log k) + l*k
+= l(n*log n + m(log n + k + k*log k) + k)
+
+I designed this program for low time complexity, and I was able to achieve it
+by using binary search, which allowed a time complexity of m*log n rather than n*m.
+There was a cost of having to sort the movies by alphabetical order beforehand,
+but the higher m is, the more impactful the binary search is, therefore making it 
+the better option overall.
+*/
 
 bool parseLine(string &line, string &movieName, double &movieRating) {
     int commaIndex = line.find_last_of(",");
