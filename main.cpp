@@ -76,15 +76,30 @@ int main(int argc, char** argv){
             prefixes.push_back(line);
         }
     }
+    
+    sort(movieList.begin(), movieList.end(),[](const Movie &a, const Movie &b) {
+        return a.title < b.title;
+    });
 
-    //  For each prefix,
-    //  Find all movies that have that prefix and store them in an appropriate data structure
-    //  If no movie with that prefix exists print the following message
     for (const string &pref : prefixes) {
+        auto it = lower_bound(movieList.begin(), movieList.end(), pref,[](const Movie &m, const string &value) {
+            return m.title < value;
+        });
         vector<Movie> matches;
+        double bestRating = -1.0;
+        string bestName;
+        bool found = false;
         for (const Movie &m : movieList) {
-            if (m.title.rfind(pref, 0) == 0)
+            if (m.title.rfind(pref, 0) == 0){
                 matches.push_back(m);
+                if (!found ||
+                    m.rating > bestRating ||
+                    (m.rating == bestRating && m.title < bestName)) {
+                    bestRating = m.rating;
+                    bestName = m.title;
+                    found = true;
+                }
+            }
         }
         if (matches.empty()) {
             cout << "No movies found with prefix " << pref << endl;
@@ -98,28 +113,12 @@ int main(int argc, char** argv){
                 m.printMovie();
             cout<<endl;
         }
-    }
-    for (const string &pref : prefixes) {
-        double bestRating = -1.0;
-        string bestName;
-        bool found = false;
-        for (const Movie &m : movieList) {
-            if (m.title.rfind(pref, 0) == 0) {
-                if (!found ||
-                    m.rating > bestRating ||
-                    (m.rating == bestRating && m.title < bestName)) {
-                    bestRating = m.rating;
-                    bestName = m.title;
-                    found = true;
-                }
-            }
-        }
         if (found) {
             cout << "Best movie with prefix " << pref << " is: "
-                << bestName << " with rating " << fixed << setprecision(1)
-                << bestRating << endl;
+                << bestName << " with rating " <<  bestRating << endl;
         }
     }
+    
     return 0;
 }
 
